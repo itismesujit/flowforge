@@ -169,6 +169,68 @@ function App() {
     });
   };
 
+  const handleImport = async () => {
+    try {
+      // Create input element
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+
+      // Handle file selection
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const content = e.target?.result as string;
+            const importedWorkflow = JSON.parse(content);
+
+            // Basic validation of the imported workflow
+            if (!importedWorkflow.nodes || !importedWorkflow.edges) {
+              throw new Error('Invalid workflow format');
+            }
+
+            // Create a new workflow with the imported content
+            const newWorkflow = {
+              ...importedWorkflow,
+              id: `workflow-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+
+            // Save to localStorage and update state
+            const { data: savedWorkflow } = await localStorageService.create(newWorkflow);
+            localStorageService.setCurrentWorkflow(savedWorkflow);
+            dispatch(setCurrentWorkflow(savedWorkflow));
+
+            toaster.create({
+              title: "Workflow imported",
+              description: "Successfully imported workflow",
+              type: "success",
+            });
+          } catch (error) {
+            toaster.create({
+              title: "Import failed",
+              description: "Failed to import workflow. Please check the file format.",
+              type: "error",
+            });
+          }
+        };
+        reader.readAsText(file);
+      };
+
+      input.click();
+    } catch (error) {
+      toaster.create({
+        title: "Import failed",
+        description: "Failed to import workflow. Please try again.",
+        type: "error",
+      });
+    }
+  };
+
   const handleShare = async () => {
     if (!currentWorkflow) {
       toaster.create({
@@ -466,6 +528,7 @@ function App() {
             onExport={handleExport}
             onSettings={handleSettings}
             onShare={handleShare}
+            onImport={handleImport}
             onProjectNameChange={handleProjectNameChange}
             onRecentWorkflowClick={handleRecentWorkflowClick}
             onNewWorkflow={handleNewWorkflow}

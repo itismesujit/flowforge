@@ -1,7 +1,7 @@
 {/* <FiZap size={22} color="white" /> */}
 import { Box, Text, Button, IconButton, Badge, HStack, VStack, Flex } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
-import { FiSettings, FiShare2, FiDownload, FiSave, FiZap, FiPlus } from 'react-icons/fi';
+import { FiSettings, FiShare2, FiDownload, FiSave, FiZap, FiPlus, FiUpload } from 'react-icons/fi';
 
 interface WorkflowHeaderProps {
   projectName?: string;
@@ -10,6 +10,7 @@ interface WorkflowHeaderProps {
   onExport?: () => void;
   onSettings?: () => void;
   onShare?: () => void;
+  onImport?: () => void;
   onProjectNameChange?: (name: string) => void;
   onRecentWorkflowClick?: (workflowName: string) => void;
   onNewWorkflow?: () => void;
@@ -25,6 +26,7 @@ const WorkflowHeader = ({
   onProjectNameChange,
   onRecentWorkflowClick,
   onNewWorkflow,
+  onImport,
 }: WorkflowHeaderProps) => {
   const [isProjectNameEditing, setIsProjectNameEditing] = useState(false);
   const [editableProjectName, setEditableProjectName] = useState(projectName);
@@ -215,6 +217,24 @@ const WorkflowHeader = ({
           >
             <FiDownload size={16} />
             Export
+          </Button>
+
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={onImport}
+            borderRadius="lg"
+            transition="all 0.2s"
+            _hover={{
+              bg: 'teal.50',
+              color: 'teal.600',
+            }}
+            _active={{
+              bg: 'teal.100',
+            }}
+          >
+            <FiUpload size={16} />
+            Import
           </Button>
 
           <Button
